@@ -1,0 +1,109 @@
+@startuml
+
+package multiprocessing <<Node>>{
+
+    class Process
+    class Queue
+
+}
+
+package state_machine <<Node>>{
+
+    class StateMachine{
+        #dict states
+
+        {static} +StateMachine()
+        #execute_state(string s)
+    }
+
+    class QSM{
+        #string idle
+        #string initial
+        #string error
+        #string exit
+        #deque q
+
+        {static} +QSM(string idle, string initial, string error, string stop)
+        #None add_state(string s)
+        #None add_states(list s)
+        #string get_next(bool execute)
+    }
+
+    StateMachine <|-- QSM
+
+}
+
+package modules <<Node>>{
+
+    class Module{
+        +bool is_stopping
+        #Exception raised_error
+
+        #None module_init()
+        #None module_event_check()
+        #None module_err()
+        #None module_exit()
+        #None module_STOP()
+    }
+
+    Process <|-- Module
+    QSM <|-- Module
+
+}
+
+package communication <<Node>>{
+
+    class Message{
+        +string command
+        +Object data
+    }
+
+    class IonLink{
+        +Queue rx
+        -Queue tx
+
+        {static} +None IonLink(Queue tx, Queue rx)
+        #None send_message(Message msg)
+        #Message wait_for_message()
+    }
+
+    Queue *.. IonLink
+    Message *.. IonLink
+
+    class IonModule{
+    }
+
+    Module <|-- IonModule
+    IonLink <|-- IonModule
+
+    class IonProcessor{
+        {static} +Queue global_q
+
+        +None register_module(IonLink mod)
+    }
+
+    Module <|-- IonProcessor
+    IonLink *.. IonProcessor
+
+}
+
+package application <<Node>>{
+
+    class Application{
+        +IonModule[] modules
+        #IonProcessor comm_processor
+        -IonModule[] initialized_mods
+
+        +start()
+        #modules_initialize()
+        #modules_setup()
+        #modules_start()
+        #modules_cleanup()
+    }
+
+    QSM <|-- Application
+    IonModule *.. Application
+    IonProcessor *.. Application
+
+}
+@enduml
