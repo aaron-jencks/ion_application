@@ -38,13 +38,11 @@ class IonModule(Module, IonLink):
     def __init__(self, tx: Queue, rx: Queue, **kwargs):
         Module.__init__(self, **kwargs)
         IonLink.__init__(self, tx, rx)
-        self.current_msg = None
 
-    def module_event_check(self):
+    def module_event_check(self, data=None):
         msg = self.wait_for_message()
         if msg.command in self.states:
-            self.current_msg = msg
-            self.add_state(msg.command)
+            self.add_state(msg.command, msg)
 
 
 class IonProcessor(Module):
@@ -67,7 +65,7 @@ class IonProcessor(Module):
         mod.tx = self.global_q
         self.mods.append(mod.rx)
 
-    def module_event_check(self):
+    def module_event_check(self, data=None):
         msg = self.global_q.get()
         for m in self.mods:
             m.put(msg)

@@ -5,7 +5,6 @@ from multiprocessing import Queue
 
 class Application:
     def __init__(self):
-        super().__init__()
         self.ion_processor = IonProcessor()
         self.modules = []  # <-- Add your modules to this list
         self.initialized_mods = []
@@ -21,7 +20,7 @@ class Application:
         """Instantiates each module by calling their constructors and linking them to the ion_processor"""
         self.initialized_mods = []
         for m in self.modules:
-            if m == IonModule:
+            if issubclass(m, IonModule):
                 self.initialized_mods.append(m(tx=self.ion_processor.global_q, rx=Queue()))
             else:
                 self.initialized_mods.append(m())

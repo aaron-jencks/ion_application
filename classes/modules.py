@@ -17,41 +17,40 @@ class Module(Process, QSM):
         self.states[self.unknown] = self.module_unknown_state
 
         self.is_stopping = False
-        self.raised_error = None
 
     def start(self):
         while not self.is_stopping:
             try:
                 self.get_next()
-            except Exception:
-                self.raised_error = sys.exc_info()
-                self.add_state(self.error)
+            except Exception as e:
+                print(e)
+                self.add_state(self.error, sys.exc_info())
         self.module_STOP()
 
-    def module_unknown_state(self):
+    def module_unknown_state(self, data=None):
         """This state is executed if the state does not currently exist in the state dictionary"""
         pass
 
-    def module_init(self):
+    def module_init(self, data=None):
         """This is always the first state to be run"""
         pass
 
-    def module_event_check(self):
+    def module_event_check(self, data=None):
         """This module is used as an idle state, whenever the module is not doing computation, it sits here."""
         pass
 
-    def module_err(self):
+    def module_err(self, data: tuple):
         """Handles errors that might be raised during operation"""
-        et, v, tb = self.raised_error
+        et, v, tb = data
         traceback.print_exception(et, v, tb)
         self.add_state(self.exit)
 
-    def module_exit(self):
+    def module_exit(self, data=None):
         """Called when the module is exitting,
         put any states that you need to be called before completely stopping here."""
         self.is_stopping = True
 
-    def module_STOP(self):
+    def module_STOP(self, data=None):
         """This state is always the last state to execute"""
         self.__del__()
 

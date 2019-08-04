@@ -3,7 +3,7 @@ from classes.modules import Module
 
 
 class MyModule(Module):
-    def module_init(self):
+    def module_init(self, data=None):
         print("Hello World!")
         self.add_state(self.exit)
 
