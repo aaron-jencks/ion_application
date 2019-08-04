@@ -1,4 +1,4 @@
-from .communication import IonProcessor
+from .communication import IonProcessor, IonModule
 
 from multiprocessing import Queue
 
@@ -19,12 +19,18 @@ class Application:
 
     def modules_initialize(self):
         """Instantiates each module by calling their constructors and linking them to the ion_processor"""
-        self.initialized_mods = [m(tx=self.ion_processor.global_q, rx=Queue()) for m in self.modules]
+        self.initialized_mods = []
+        for m in self.modules:
+            if m == IonModule:
+                self.initialized_mods.append(m(tx=self.ion_processor.global_q, rx=Queue()))
+            else:
+                self.initialized_mods.append(m())
 
     def modules_setup(self):
         """Links each modules up to the ion_processor for communication"""
         for m in self.initialized_mods:
-            self.ion_processor.register_module(m)
+            if isinstance(m, IonModule):
+                self.ion_processor.register_module(m)
 
     def modules_start(self):
         """Launches all of the modules"""
@@ -34,4 +40,5 @@ class Application:
     def modules_cleanup(self):
         """Waits for all of the modules to finish running"""
         for m in self.initialized_mods:
-            m.join()
+            if m.is_alive():
+                m.join()

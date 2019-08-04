@@ -8,7 +8,8 @@ import sys
 class Module(Process, QSM):
     """A Module implementing a QSM with all of the standard states filled in"""
     def __init__(self, **kwargs):
-        super().__init__(self, **kwargs)
+        Process.__init__(self, **kwargs)
+        QSM.__init__(self)
         self.states[self.initial] = self.module_init
         self.states[self.idle] = self.module_event_check
         self.states[self.error] = self.module_err
