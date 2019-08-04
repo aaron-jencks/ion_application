@@ -35,9 +35,15 @@ class IonLink:
 class IonModule(Module, IonLink):
     """Represents a Module Object that inherits from an IonLink, the module_event_check state is overriden with an
     event handler that waits for events from the rx Queue."""
+    def __init__(self, tx: Queue, rx: Queue, **kwargs):
+        Module.__init__(self, **kwargs)
+        IonLink.__init__(self, tx, rx)
+        self.current_msg = None
+
     def module_event_check(self):
         msg = self.wait_for_message()
         if msg.command in self.states:
+            self.current_msg = msg
             self.add_state(msg.command)
 
 
