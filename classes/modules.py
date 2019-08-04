@@ -26,6 +26,10 @@ class Module(Process, QSM):
                 self.add_state(self.error)
         self.module_STOP()
 
+    def module_unknown_state(self):
+        """This state is executed if the state does not currently exist in the state dictionary"""
+        pass
+
     def module_init(self):
         """This is always the first state to be run"""
         pass
