@@ -23,13 +23,14 @@ class StateMachine:
 
 class QSM(StateMachine):
     def __init__(self, idle: str = 'event check', initial: str = 'initialize',
-                 error: str = 'error', stop: str = 'exit'):
+                 error: str = 'error', stop: str = 'exit', unknown: str = 'unknown state'):
         super().__init__()
 
         self.idle = idle
         self.initial = initial
         self.error = error
         self.exit = stop
+        self.unknown = unknown
 
         self.q = deque([self.initial])
 
@@ -72,6 +73,8 @@ class QSM(StateMachine):
             state = self.idle
         else:
             state = self.q.popleft()
+            if state not in self.states:
+                state = self.unknown
 
         if execute:
             self.execute_state(state)

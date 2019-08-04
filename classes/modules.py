@@ -13,6 +13,7 @@ class Module(Process, QSM):
         self.states[self.idle] = self.module_event_check
         self.states[self.error] = self.module_err
         self.states[self.exit] = self.module_exit
+        self.states[self.unknown] = self.module_unknown_state
 
         self.is_stopping = False
         self.raised_error = None
