@@ -3,6 +3,7 @@ from .state_machine import QSM
 
 import traceback
 import sys
+import os
 
 
 class Module(Process, QSM):
@@ -18,7 +19,7 @@ class Module(Process, QSM):
 
         self.is_stopping = False
 
-    def start(self):
+    def run(self):
         while not self.is_stopping:
             try:
                 self.get_next()
@@ -53,4 +54,26 @@ class Module(Process, QSM):
     def module_STOP(self, data=None):
         """This state is always the last state to execute"""
         self.__del__()
+
+
+class ConsoleModule(Module):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.stdin = os.fdopen(os.dup(sys.stdin.fileno()))
+        self.stdout = os.fdopen(os.dup(sys.stdout.fileno()))
+        self.stderr = os.fdopen(os.dup(sys.stderr.fileno()))
+
+    def run(self):
+        # Should ensure that print() and input() functions work.
+        import sys
+        sys.stdin = self.stdin
+        sys.stdout = self.stdout
+        sys.stderr = self.stderr
+
+        super().run()
+
+    def module_STOP(self, data=None):
+        self.stdin.close()
+        self.stdout.close()
+        self.stderr.close()
 

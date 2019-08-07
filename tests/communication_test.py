@@ -12,8 +12,11 @@ class ChatMessage(Message):
 
 class Transmitter(IonModule):
     def module_event_check(self, data=None):
-        msg = input('Say something: ')
-        self.send_message(ChatMessage(msg))
+        try:
+            msg = input('Say something: ')
+            self.send_message(ChatMessage(msg))
+        except EOFError as e:
+            print("Received blank line at input")
 
 
 class Receiver(IonModule):

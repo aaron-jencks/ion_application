@@ -49,6 +49,14 @@ package modules <<Node>>{
     Process <|-- Module
     QSM <|-- Module
 
+    class ConsoleModule{
+        +int stdin
+        +int stdout
+        +int stderr
+    }
+
+    Module <|-- ConsoleModule
+
 }
 
 package communication <<Node>>{

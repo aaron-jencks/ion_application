@@ -35,6 +35,7 @@ class Application:
         """Launches all of the modules"""
         for m in self.initialized_mods:
             m.start()
+        self.ion_processor.start()
 
     def modules_cleanup(self):
         """Waits for all of the modules to finish running"""
