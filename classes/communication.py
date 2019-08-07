@@ -1,5 +1,5 @@
 from multiprocessing import Queue
-from .modules import Module
+from .modules import Module, TModule
 
 
 class Message:
@@ -37,6 +37,19 @@ class IonModule(Module, IonLink):
     event handler that waits for events from the rx Queue."""
     def __init__(self, tx: Queue, rx: Queue, **kwargs):
         Module.__init__(self, **kwargs)
+        IonLink.__init__(self, tx, rx)
+
+    def module_event_check(self, data=None):
+        msg = self.wait_for_message()
+        if msg.command in self.states:
+            self.add_state(msg.command, msg)
+
+
+class IonTModule(TModule, IonLink):
+    """Represents a Module Object that inherits from an IonLink, the module_event_check state is overriden with an
+    event handler that waits for events from the rx Queue."""
+    def __init__(self, tx: Queue, rx: Queue, **kwargs):
+        TModule.__init__(self, **kwargs)
         IonLink.__init__(self, tx, rx)
 
     def module_event_check(self, data=None):

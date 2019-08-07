@@ -1,4 +1,4 @@
-from .communication import IonProcessor, IonModule
+from .communication import IonProcessor, IonLink
 
 from multiprocessing import Queue
 
@@ -20,7 +20,7 @@ class Application:
         """Instantiates each module by calling their constructors and linking them to the ion_processor"""
         self.initialized_mods = []
         for m in self.modules:
-            if issubclass(m, IonModule):
+            if issubclass(m, IonLink):
                 self.initialized_mods.append(m(tx=self.ion_processor.global_q, rx=Queue()))
             else:
                 self.initialized_mods.append(m())
@@ -28,7 +28,7 @@ class Application:
     def modules_setup(self):
         """Links each modules up to the ion_processor for communication"""
         for m in self.initialized_mods:
-            if isinstance(m, IonModule):
+            if isinstance(m, IonLink):
                 self.ion_processor.register_module(m)
 
     def modules_start(self):

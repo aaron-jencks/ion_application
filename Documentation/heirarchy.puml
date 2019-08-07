@@ -7,6 +7,10 @@ package multiprocessing <<Node>>{
 
 }
 
+package threading <<Node>>{
+    class Thread
+}
+
 package state_machine <<Node>>{
 
     class StateMachine{
@@ -49,13 +53,19 @@ package modules <<Node>>{
     Process <|-- Module
     QSM <|-- Module
 
-    class ConsoleModule{
-        +int stdin
-        +int stdout
-        +int stderr
+    class TModule{
+        +bool is_stopping
+        #Exception raised_error
+
+        #None module_init()
+        #None module_event_check()
+        #None module_err()
+        #None module_exit()
+        #None module_STOP()
     }
 
-    Module <|-- ConsoleModule
+    Thread <|-- TModule
+    QSM <|-- TModule
 
 }
 
@@ -84,6 +94,12 @@ package communication <<Node>>{
     Module <|-- IonModule
     IonLink <|-- IonModule
 
+    class IonTModule{
+    }
+
+    TModule <|-- IonTModule
+    IonLink <|-- IonTModule
+
     class IonProcessor{
         {static} +Queue global_q
 
@@ -110,7 +126,9 @@ package application <<Node>>{
     }
 
     QSM <|-- Application
-    IonModule *.. Application
+    IonLink *.. Application
+    Module *.. Application
+    TModule *.. Application
     IonProcessor *.. Application
 
 }
